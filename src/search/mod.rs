@@ -8,12 +8,19 @@ pub fn search_file(path: &String, query: &String) -> Result<Vec<search_result::S
     let buf_reader = io::BufReader::new(file);
     let mut search_results: Vec<search_result::SearchResult> = vec!();
     let mut line_number = 1;
+
     for line_result in buf_reader.lines() {
-        let line = line_result?;
-        if line.contains(query) {
-            let cursor_pos = line.find(query).unwrap() as u64;
-            search_results.push(search_result::SearchResult::new(path.to_string(), query.to_string(), line_number, cursor_pos));
-        }   
+        match line_result {
+            Ok(line) => {
+                if line.contains(query) {
+                    let cursor_pos = line.find(query).unwrap() as u64;
+                    search_results.push(search_result::SearchResult::new(path.to_string(), query.to_string(), line_number, cursor_pos));
+                }   
+            }, 
+            Err(_err) => {
+
+            }
+        }
         line_number =  line_number + 1;
     }
 
